@@ -520,6 +520,26 @@
     </style>
 </head>
 <body>
+     <!-- Privacy Policy Popup -->
+    <div class="privacy-overlay" id="privacyOverlay">
+        <div class="privacy-popup">
+            <h3>🔒 הודעת פרטיות</h3>
+            <p>
+                האתר מאוחסן ב-GitHub Pages. איננו אוספים נתונים או מטמיעים עוגיות מעקב. 
+                ייתכן ש-GitHub משתמשים בעוגיות טכניות בלבד לצורכי אבטחה וביצועים.
+            </p>
+            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 25px;">
+                <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" 
+                   target="_blank" 
+                   style="color: #2563eb; text-decoration: underline;">
+                   למדיניות GitHub
+                </a>
+            </p>
+            <button class="privacy-btn" onclick="closePrivacyPopup()">
+                הבנתי ✓
+            </button>
+        </div>
+    </div>
     <div class="container">
         <div class="header">
             <h1>💰 מחשבון חיסכון - לעצמאות כלכלית</h1>
@@ -1480,33 +1500,5 @@
   </div>
 
   <script>
-  (function () {
-    var KEY = "privacyAccepted_v1";
-    function show() {
-      var el = document.getElementById("privacy-banner");
-      if (el) el.classList.remove("hidden");
-    }
-    function hide() {
-      var el = document.getElementById("privacy-banner");
-      if (el) el.classList.add("hidden");
-    }
-    function accepted() {
-      try {
-        var raw = localStorage.getItem(KEY);
-        return !!(raw && JSON.parse(raw).accepted);
-      } catch(e) { return false; }
-    }
-    document.addEventListener("DOMContentLoaded", function() {
-      if (!accepted()) show();
-      var btn = document.getElementById("privacy-accept");
-      if (btn) {
-        btn.addEventListener("click", function() {
-          try { localStorage.setItem(KEY, JSON.stringify({accepted:true, ts:new Date().toISOString()})); } catch(e) {}
-          hide();
-        });
-      }
-    });
-  })();
-  </script>
-</body>
+ </body>
 </html> 
