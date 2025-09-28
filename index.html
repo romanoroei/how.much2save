@@ -1451,5 +1451,62 @@
             new PensionCalculator();
         });
     </script>
+      <!-- Privacy Banner (Hebrew, RTL, with dark border) -->
+  <div id="privacy-banner" role="region" aria-label="הודעת פרטיות" class="fixed inset-x-0 bottom-0 z-50 hidden">
+    <div class="mx-auto max-w-5xl px-4 pb-4">
+      <div class="rounded-t-md bg-white text-gray-800 border border-black text-xs">
+        <div class="p-2 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-4">
+          <div class="flex-1 text-sm leading-6">
+            <p class="font-medium">הודעת פרטיות</p>
+            <p class="text-gray-600 mt-0.5">
+              האתר מאוחסן ב-GitHub Pages. איננו אוספים נתונים או מטמיעים עוגיות מעקב.
+              ייתכן ש-GitHub משתמשים בעוגיות טכניות בלבד לצורכי אבטחה וביצועים.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement"
+               target="_blank" rel="noopener"
+               class="text-sm text-blue-700 hover:underline px-3 py-2 rounded-lg">
+              למדיניות GitHub
+            </a>
+            <button id="privacy-accept"
+                    class="text-sm px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-blue-700 focus:outline-none focus:ring">
+              הבנתי
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var KEY = "privacyAccepted_v1";
+    function show() {
+      var el = document.getElementById("privacy-banner");
+      if (el) el.classList.remove("hidden");
+    }
+    function hide() {
+      var el = document.getElementById("privacy-banner");
+      if (el) el.classList.add("hidden");
+    }
+    function accepted() {
+      try {
+        var raw = localStorage.getItem(KEY);
+        return !!(raw && JSON.parse(raw).accepted);
+      } catch(e) { return false; }
+    }
+    document.addEventListener("DOMContentLoaded", function() {
+      if (!accepted()) show();
+      var btn = document.getElementById("privacy-accept");
+      if (btn) {
+        btn.addEventListener("click", function() {
+          try { localStorage.setItem(KEY, JSON.stringify({accepted:true, ts:new Date().toISOString()})); } catch(e) {}
+          hide();
+        });
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
