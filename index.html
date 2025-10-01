@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון חיסכון - לעצמאות כלכלית - רועי רומנו מתכנן פיננסי</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #ffffff;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            color: #000000;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff;
+            padding: 18px 36px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+        
+        .result {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-amount {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .result-text {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .comparison {
+            display: none;
+        }
+        
+        .comparison.show {
+            display: block;
+        }
+        
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin: 10px 0;
+            background: #f8fafc;
+            border-radius: 12px;
+            border-right: 5px solid #e2e8f0;
+            color: #1e3a8a;
+        }
+        
+        .comparison-row.highlight {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
+            color: #000000;
+            border-color: #ffd700;
+        }
+        
+        .age {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .amount {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        /* טבלת חישוב שנתית */
+        .yearly-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .yearly-table th {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffd700;
+            padding: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .yearly-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e3a8a;
+        }
+
+        .yearly-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        .yearly-table tr:nth-child(even) td {
+            color: #1e3a8a;
+        }
+
+        .yearly-table tr:hover {
+            background: #e2e8f0;
+        }
+        
+        .yearly-table tr:hover td {
+            color: #1e3a8a;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        /* Chart Styles */
+        .chart-section {
+            height: 500px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .chart-canvas {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .cta-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            opacity: 0.95;
+        }
+
+        .cta-name {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #ffd700;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .cta-btn {
+            background: #ffd700;
+            color: #000000;
+            padding: 18px 35px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            color: #ffffff;
+        }
+
+        .whatsapp-btn:hover {
+            background: #22C55E;
+        }
+
+        .calendly-btn {
+            background: #ffffff;
+            color: #1e3a8a;
+        }
+
+        .calendly-btn:hover {
+            background: #f8fafc;
+        }
+
+        /* סגנונות לקטע יצירת הקשר החדש */
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .whatsapp-btn[style*="background: #25D366"]:hover {
+            background: #22C55E !important;
+        }
+        
+        .calendly-btn[style*="background: #0069D9"]:hover {
+            background: #0056B3 !important;
+        }
+        
+        /* Disclaimer */
+        .disclaimer {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+
+        .disclaimer h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .disclaimer p {
+            margin-bottom: 10px;
+        }
+
+        /* Privacy Policy Popup */
+        .privacy-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .privacy-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .privacy-popup {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            text-align: right;
+            direction: rtl;
+        }
+
+        .privacy-overlay.show .privacy-popup {
+            transform: scale(1);
+        }
+
+        .privacy-popup h3 {
+            color: #1e40af;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .privacy-popup p {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .privacy-btn {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .privacy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .tips {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: #ffd700;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid #ffd700;
+        }
+        
+        .tips h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .tip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .tip h4 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .tip p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .result-amount {
+                font-size: 2.5rem;
+            }
+            
+            .comparison-row {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            /* תיקוני מובייל חדשים */
+            .result-section .stat-value,
+            .result-section div[style*="font-size: 1.8rem"],
+            .result-section div[style*="font-weight: bold"] {
+                font-size: 1.3rem !important;
+            }
+            
+            .result-section div[style*="font-size: 2.2rem"] {
+                font-size: 1.6rem !important;
+            }
+            
+            .result-section h4 {
+                font-size: 1.3rem !important;
+            }
+            
+            /* כלל כוח-על לאיחוד גדלי פונט */
+            .result-section div[style*="1.8rem"] {
+                font-size: 1.3rem !important;
+            }
+            
+            /* איחוד כל המספרים הגדולים בקטעי התוצאות */
+            .result-section > div[style*="grid"] div:first-child > div:first-child,
+            .result-section > div[style*="grid"] div:last-child > div:first-child {
+                font-size: 1.3rem !important;
+            }
+            
+            /* כלל כוח מקסימלי לאיחוד מלא */
+            .result-section div[style*="font-weight: bold"][style*="1.8rem"] {
+                font-size: 1.3rem !important;
+            }
+            
+            /* איחוד גם התוויות (טקסטים קטנים) */
+            .result-section div[style*="opacity: 0.9"] {
+                font-size: 0.9rem !important;
+            }
+            
+            /* כלל אולטימטיבי לאיחוד מלא */
+            .result-section * {
+                max-font-size: 1.3rem;
+            }
+            
+            /* כלל חזק לכל המספרים */
+            .result-section div:nth-child(2) > div > div:first-child {
+                font-size: 1.3rem !important;
+            }
+            
+            /* קלאסים לאיחוד גדלי פונט במובייל */
+            .mobile-number {
+                font-size: 1.3rem !important;
+                font-weight: bold !important;
+            }
+            
+            .mobile-label {
+                font-size: 0.9rem !important;
+                opacity: 0.9 !important;
+            }
+            
+            /* תיקון פופאפ במובייל */
+            .privacy-popup {
+                padding: 20px !important;
+                margin: 15px !important;
+                max-width: 90% !important;
+                max-height: 60vh !important;
+                overflow-y: auto !important;
+            }
+            
+            .privacy-popup h3 {
+                font-size: 1.2rem !important;
+                margin-bottom: 15px !important;
+            }
+            
+            .privacy-popup p {
+                font-size: 0.9rem !important;
+                margin-bottom: 15px !important;
+                line-height: 1.5 !important;
+            }
+            
+            .privacy-popup button {
+                padding: 12px 24px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            /* תיקון טיפים קופצים במובייל */
+            .floating-tip {
+                bottom: 10px !important;
+                right: 10px !important;
+                left: 10px !important;
+                max-width: none !important;
+                width: calc(100% - 20px) !important;
+                padding: 15px !important;
+                font-size: 13px !important;
+                border-radius: 12px !important;
+            }
+            
+            .floating-tip .tip-icon {
+                font-size: 18px !important;
+            }
+            
+            .floating-tip .tip-close {
+                top: 6px !important;
+                right: 6px !important;
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 12px !important;
+            }
+            
+            .chart-container {
+                margin: 15px 0 !important;
+                padding: 15px !important;
+            }
+            
+            .chart-title {
+                font-size: 1.1rem !important;
+                text-align: center !important;
+                margin-bottom: 10px !important;
+            }
+
+            .cta-title {
+                font-size: 1.8rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cta-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .chart-section {
+                height: 350px;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Floating Tips Styles */
+        .floating-tip {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+            color: #ffd700;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 350px;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: all 0.5s ease;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 2px solid #ffd700;
+        }
+
+        .floating-tip.show {
+            transform: translateX(0);
+        }
+
+        .floating-tip .tip-close {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .floating-tip .tip-close:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .floating-tip .tip-icon {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Privacy Policy Popup -->
+    <div class="privacy-overlay" id="privacyOverlay">
+        <div class="privacy-popup">
+            <h3>🔒 הודעת פרטיות</h3>
+            <p>
+                האתר מאוחסן ב-GitHub Pages. איננו אוספים נתונים או מטמיעים עוגיות מעקב. 
+                ייתכן ש-GitHub משתמשים בעוגיות טכניות בלבד לצורכי אבטחה וביצועים.
+            </p>
+            <p style="font-size: 0.85rem; color: #6b7280; margin-bottom: 25px;">
+                <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement" 
+                   target="_blank" 
+                   style="color: #2563eb; text-decoration: underline;">
+                   למדיניות GitHub
+                </a>
+            </p>
+            <button class="privacy-btn" onclick="closePrivacyPopup()">
+                הבנתי ✓
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>💰 מחשבון חיסכון - לעצמאות כלכלית</h1>
+            <p>כמה להפקיד מדי חודש לחיסכון על מנת לצאת לפרישה מוקדמת?</p>
+            <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 12px; max-width: 600px; margin: 0 auto;">
+                💡 ככל שמתחילים מוקדם יותר - הדרך קלה יותר
+            </div>
+        </div>
+
+        <!-- טופס חישוב -->
+        <div class="card">
+            <h2 style="text-align: center; margin-bottom: 30px; font-size: 2rem; color: #4a5568;">🧮 חישוב אישי</h2>
+            
+            <form id="pensionForm">
+                <div class="form-group">
+                    <label for="currentAge">🎂 הגיל הנוכחי שלך</label>
+                    <input type="number" id="currentAge" placeholder="לדוגמה: 30" min="18" max="64" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="existingSavings">💳 סכום קיים/התחלתי להשקעה (בשקלים)</label>
+                    <input type="text" id="existingSavings" placeholder="לדוגמה: 100,000 (או 0 אם אין)" value="0">
+                    <small style="color: #666; font-size: 0.9rem; display: block; margin-top: 5px;">
+                        💡 הזינו את הסכום שחסכתם ואתם מעוניינים שיהיה חלק מההשקעה שלכם. אם אין לכם חיסכון קיים, השאירו 0
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="targetAmount">🎯 יעד החיסכון הסופי (בשקלים)</label>
+                    <input type="text" id="targetAmount" placeholder="לדוגמה: 2,000,000" value="2000000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="annualReturn">📈 תשואה שנתית (באחוזים)</label>
+                    <input type="number" id="annualReturn" placeholder="לדוגמה: 8" step="0.1" value="8" required>
+                    <small style="color: #666; font-size: 0.9rem; display: block; margin-top: 5px;">
+                        💡 צפי לתשואה שנתية ממוצעת לפני דמי ניהול<br>
+                        📅 החישוב מתבסס על הפקדות בתחילת כל חודש
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="managementFee">💼 דמי ניהול שנתיים מצבירה (באחוזים)</label>
+                    <input type="number" id="managementFee" placeholder="לדוגמה: 0.6" step="0.1" value="0.6" min="0" max="5" required>
+                    <small style="color: #666; font-size: 0.9rem; display: block; margin-top: 5px;">
+                        💡 דמי ניהול שנתיים המחושבים באופן חודשי מהצבירה<br>
+                        🎯 הזינו 0 לחישוב תיאורטי ללא דמי ניהול
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="retirementAge">📅 גיל פרישה</label>
+                    <input type="number" id="retirementAge" placeholder="לדוגמה: 65" value="65" min="60" max="70" required>
+                </div>
+
+                <button type="submit" class="btn" id="calculateBtn">
+                    ✨ חשב את החיסכון הנדרש
+                </button>
+            </form>
+        </div>
+
+        <!-- תוצאות -->
+        <div id="results" class="hidden">
+            <!-- תוצאה אישית -->
+            <div class="card">
+                <h3 class="chart-title" style="text-align: center; margin-bottom: 20px; font-size: 2rem; color: #4a5568;">🎯 התוצאה שלך</h3>
+                <div id="personalResult" class="result">
+                    <!-- תוצאות יוצגו כאן -->
+                </div>
+            </div>
+
+            <!-- CTA Section - מיד אחרי התוצאות -->
+            <div class="cta-section">
+                <div class="cta-title">🚀 מוכן להפוך את היעד למוחשי?</div>
+                <div class="cta-subtitle">קבל ייעוץ מקצועי ומותאם אישית</div>
+                <div class="cta-name">רועי רומנו - מתכנן פיננסי</div>
+                
+                <div class="cta-buttons">
+                    <a href="https://wa.me/972528089808?text=ראיתי%20את%20המחשבון%20ואני%20רוצה%20להתחיל%20לחסוך%20,%20איך%20מתחילים%20?" 
+                       class="cta-btn whatsapp-btn" target="_blank">
+                        📱 שלח הודעה בווטסאפ
+                    </a>
+                    <a href="https://calendly.com/roeir-ar-fo/first-meeting" 
+                       class="cta-btn calendly-btn" target="_blank">
+                        📅 לתאום פגישה ביומן
+                    </a>
+                </div>
+                
+                <div style="margin-top: 25px; font-size: 1rem; opacity: 0.9;">
+                    💼 ייעוץ ללא התחייבות | 🎯 תכנון מותאם אישית | 📈 מעקב צמוד
+                </div>
+            </div>
+
+            <!-- גרף צמיחת החיסכון -->
+            <div class="card chart-container">
+                <h3 class="chart-title" style="text-align: center; margin-bottom: 20px; font-size: 2rem; color: #4a5568;">📈 גרף צמיחת החיסכון</h3>
+                <div id="chartExplanation" style="background: #e6fffa; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; color: #2d3748;">
+                    📊 רואים איך הריבית דריבית עובדת לטובתכם - הפקדות בתחילת חודש + רווח מתווסף!
+                </div>
+                <div class="chart-section">
+                    <canvas id="savingsChart" class="chart-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- השוואה בין גילאים -->
+            <div class="card">
+                <h3 class="chart-title" style="text-align: center; margin-bottom: 20px; font-size: 2rem; color: #4a5568;">📊 השוואה לפי גיל התחלה</h3>
+                <div style="background: #e6fffa; padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; color: #2d3748;">
+                    💡 ככל שמתחילים מוקדם יותר - הסכום החודשי הנדרש קטן יותר!
+                </div>
+                <div id="ageComparison" class="comparison">
+                    <!-- השוואות יוצגו כאן -->
+                </div>
+            </div>
+
+            <!-- טבלת חישוב שנתית -->
+            <div class="card">
+                <h3 class="chart-title" style="text-align: center; margin-bottom: 20px; font-size: 2rem; color: #4a5568;">📈 פירוט צמיחת החיסכון לפי שנים</h3>
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; color: #1e40af; border: 1px solid #e0f2fe;">
+                    📅 החישוב מבוסס על הפקדות בתחילת כל חודש + רווח חודשי על כל הסכום
+                </div>
+                <div class="table-container">
+                    <table class="yearly-table" id="yearlyTable">
+                        <thead>
+                            <tr>
+                                <th>שנה</th>
+                                <th>גיל</th>
+                                <th>הפקדה שנתית</th>
+                                <th>יתרה בתחילת השנה</th>
+                                <th>רווח נטו</th>
+                                <th id="managementFeeHeader">דמי ניהול</th>
+                                <th>יתרה בסוף השנה</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- הנתונים יוכנסו כאן -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- טיפים -->
+        <div class="tips">
+            <h3>🎓 עקרונות חשובים בחיסכון לפנסיה</h3>
+            <div class="tips-grid">
+                <div class="tip">
+                    <h4>🚀 התחל מוקדם</h4>
+                    <p>ככל שמתחילים לחסוך מוקדם יותר, כך הריבית דריבית עובדת לטובתכם יותר זמן. אפילו סכומים קטנים יכולים לצמוח לסכומים משמעותיים.</p>
+                </div>
+                <div class="tip">
+                    <h4>💰 חישוב מדויק וריאליסטי</h4>
+                    <p>החישוב מתבסס על הפקדות בתחילת כל חודש ודמי הניהול שהזנתם. ברירת המחדל 0.6% משקפת את המציאות בקופות גמל.</p>
+                </div>
+                <div class="tip">
+                    <h4>💪 עקביות בחיסכון</h4>
+                    <p>חשוב לשמור על עקביות בחיסכון החודשי. גם אם לא תמיד אפשר להפקיד את מלוא הסכום, המשיכו להפקיד כמה שאפשר.</p>
+                </div>
+                <div class="tip">
+                    <h4>📈 גיוון</h4>
+                    <p>פזרו את ההשקעות בין מוצרים שונים להפחתת סיכונים. התייעצו עם יועץ פיננסי מקצועי.</p>
+                </div>
+                <div class="tip">
+                    <h4>⏰ אל תדחו</h4>
+                    <p>כל עשור של דחייה כמעט מכפיל את הסכום החודשי הדרוש. זמן הוא המשאב החשוב ביותר בחיסכון לפנסיה.</p>
+                </div>
+                <div class="tip">
+                    <h4>📉 כסף בבית מאבד ערך</h4>
+                    <p>כסף שנשאר בחשבון עו"ש או במזומן מאבד מערכו בכל יום בגלל האינפלציה. השקעה חכמה מגנה על הכסף ומצמיחה אותו בזמן.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- אפשרויות יצירת קשר -->
+        <div class="card">
+            <div style="text-align: center; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); 
+                        padding: 40px; border-radius: 16px; margin-bottom: 0; color: white;">
+                <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: white;">💬 אפשרויות יצירת קשר</h3>
+                <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.95;">
+                    מוכנים להתחיל לחסוך בצורה חכמה? בואו נדבר!
+                </p>
+                <div class="cta-name" style="font-size: 1.3rem; margin-bottom: 25px; font-weight: 600;">
+                    רועי רומנו - מתכנן פיננסי
+                </div>
+                
+                <div class="cta-buttons" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://wa.me/972528089808?text=ראיתי%20את%20המחשבון%20ואני%20רוצה%20להתחיל%20לחסוך%20,%20איך%20מתחילים%20?" 
+                       class="cta-btn whatsapp-btn" target="_blank"
+                       style="background: #25D366; color: white; padding: 15px 25px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: inline-block;">
+                        📱 שלח הודעה בווטסאפ
+                    </a>
+                    <a href="https://calendly.com/roeir-ar-fo/first-meeting" 
+                       class="cta-btn calendly-btn" target="_blank"
+                       style="background: #ffffff; color: #1e3a8a; border: 2px solid #1e3a8a; padding: 15px 25px; border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; display: inline-block;">
+                        📅 לתאום פגישה ביומן
+                    </a>
+                </div>
+                
+                <div style="margin-top: 25px; font-size: 1.1rem; opacity: 0.95;">
+                    💼 ייעוץ ללא התחייבות | 🎯 תכנון מותאם אישית | 📈 מעקב צמוד
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 1rem; opacity: 0.9; 
+                           background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                    <strong>📧 אפשר גם לשלוח מייל:</strong> <a href="mailto:roeir@ar-fo.co.il" style="color: #FFD700; text-decoration: underline;">roeir@ar-fo.co.il</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            <h4>⚠️ הסתייגות וכתב ויתור אחריות</h4>
+            <p><strong>מידע כללי בלבד:</strong> המחשבון והמידע המוצגים באתר זה הינם לצרכי מידע כללי בלבד ואינם מהווים ייעוץ פיננסי, השקעות או פנסיוני מותאם אישית.</p>
+            
+            <p><strong>אין התחייבות לתוצאות:</strong> התוצאות המוצגות במחשבון מבוססות על הנחות כלליות ועלולות להיות שונות מהמציאות. שוק ההון כרוך בסיכונים ותשואות עבר אינן מבטיחות תשואות עתיד.</p>
+            
+            <p><strong>ייעוץ מקצועי נדרש:</strong> לפני קבלת החלטות פיננסיות כלשהן, מומלץ בחום להתייעץ עם יועץ פיננסי מקצועי המכיר את נסיבותיכם האישיות.</p>
+            
+<p><strong>מיסוי:</strong> החישובים אינם לוקחים בחשבון מיסוי על רווחים שעלול להשפיע על התוצאה הסופית. יש להתייעץ עם יועץ מס לגבי השלכות המיסוי.</p>
+            
+            <p><strong>שחרור מאחריות:</strong> רועי רומנו ו/או מפעילי האתר אינם נושאים באחריות לכל נזק, ישיר או עקיף, שעלול להיגרם כתוצאה מהשימוש במחשבון או במידע המוצג באתר.</p>
+            
+            <p><strong>עדכון מידע:</strong> המידע והנתונים באתר עשויים להשתנות מעת לעת ללא הודעה מוקדמת. מומלץ לבדוק עדכניות המידע לפני כל שימוש.</p>
+        </div>
+    </div>
+
+    <script>
+        class PensionCalculator {
+            constructor() {
+                this.form = document.getElementById('pensionForm');
+                this.resultsSection = document.getElementById('results');
+                this.personalResult = document.getElementById('personalResult');
+                this.ageComparison = document.getElementById('ageComparison');
+                this.yearlyTable = document.getElementById('yearlyTable');
+                this.calculateBtn = document.getElementById('calculateBtn');
+                this.chart = null;
+                
+                this.initEventListeners();
+                this.startFloatingTips();
+            }
+
+            initEventListeners() {
+                this.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.calculateAndDisplayResults();
+                });
+                
+                // הוספת עיצוב פסיקים לשדה יעד החיסכון
+                const targetAmountInput = document.getElementById('targetAmount');
+                
+                // עיצוב כשהמשתמש יוצא מהשדה
+                targetAmountInput.addEventListener('blur', (e) => {
+                    this.formatNumberInput(e.target);
+                });
+                
+                // מונע הקלדה של תווים לא רצויים
+                targetAmountInput.addEventListener('keypress', (e) => {
+                    // מאפשר רק ספרות, backspace, delete, וחיצים
+                    if (!/\d/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+                
+                // עיצוב בזמן הקלדה (עם דיליי)
+                targetAmountInput.addEventListener('input', (e) => {
+                    clearTimeout(this.formatTimeout);
+                    this.formatTimeout = setTimeout(() => {
+                        this.formatNumberInput(e.target);
+                    }, 1000);
+                });
+                
+                // עיצוב ראשוני
+                setTimeout(() => {
+                    this.formatNumberInput(targetAmountInput);
+                }, 100);
+
+                // הוספת פורמט פסיקים לשדה החיסכון הקיים
+                const existingSavingsInput = document.getElementById('existingSavings');
+                
+                // עיצוב כשהמשתמש יוצא מהשדה
+                existingSavingsInput.addEventListener('blur', (e) => {
+                    this.formatNumberInput(e.target);
+                });
+                
+                // מונע הקלדה של תווים לא רצויים
+                existingSavingsInput.addEventListener('keypress', (e) => {
+                    if (!/\d/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+                        e.preventDefault();
+                    }
+                });
+                
+                // עיצוב בזמן הקלדה (עם דיליי)
+                existingSavingsInput.addEventListener('input', (e) => {
+                    clearTimeout(this.formatTimeout);
+                    this.formatTimeout = setTimeout(() => {
+                        this.formatNumberInput(e.target);
+                    }, 1000);
+                });
+                
+                // עיצוב ראשוני
+                setTimeout(() => {
+                    this.formatNumberInput(existingSavingsInput);
+                }, 100);
+            }
+
+            isFormValid() {
+                const currentAge = parseInt(document.getElementById('currentAge').value);
+                // הסרת פסיקים לפני בדיקת תקינות
+                const targetAmount = parseInt(document.getElementById('targetAmount').value.replace(/[^\d]/g, ''));
+                const existingSavings = parseInt(document.getElementById('existingSavings').value.replace(/[^\d]/g, '') || '0');
+                const annualReturn = parseFloat(document.getElementById('annualReturn').value);
+                const managementFee = parseFloat(document.getElementById('managementFee').value);
+                const retirementAge = parseInt(document.getElementById('retirementAge').value);
+
+                return currentAge && targetAmount && !isNaN(annualReturn) && !isNaN(managementFee) && retirementAge &&
+                       currentAge >= 18 && currentAge < retirementAge && targetAmount > 0 && annualReturn >= 0 &&
+                       existingSavings >= 0 && managementFee >= 0 && managementFee <= 5;
+            }
+
+            calculateAndDisplayResults() {
+                if (!this.isFormValid()) {
+                    alert('אנא מלא את כל השדות בצורה תקינה');
+                    return;
+                }
+
+                // הצגת אינדיקטור טעינה
+                this.calculateBtn.innerHTML = '<span class="loading"></span> מחשב...';
+                this.calculateBtn.disabled = true;
+
+                setTimeout(() => {
+                    const currentAge = parseInt(document.getElementById('currentAge').value);
+                    // הסרת פסיקים לפני המרה למספר
+                    const targetAmount = parseInt(document.getElementById('targetAmount').value.replace(/[^\d]/g, ''));
+                    const existingSavings = parseInt(document.getElementById('existingSavings').value.replace(/[^\d]/g, '') || '0');
+                    const annualReturn = parseFloat(document.getElementById('annualReturn').value) / 100;
+                    const managementFee = parseFloat(document.getElementById('managementFee').value) / 100;
+                    const retirementAge = parseInt(document.getElementById('retirementAge').value);
+
+                    // חישוב התוצאה האישית עם חיסכון קיים ודמי ניהול דינמיים
+                    const personalResult = this.calculateMonthlyPayment(currentAge, retirementAge, targetAmount, annualReturn, existingSavings, managementFee);
+                    
+                    // שמירת הנתונים המשותפים לכל הרכיבים - משתמש באותו חישוב שבתוצאות הראשיות
+                    this.sharedData = {
+                        monthlyPayment: personalResult.monthlyPayment,
+                        yearlyData: this.calculateYearlyDataWithExistingSavings(personalResult.monthlyPayment, annualReturn, managementFee, personalResult.years, existingSavings),
+                        years: personalResult.years,
+                        annualReturn: annualReturn,
+                        managementFee: managementFee,
+                        existingSavings: existingSavings
+                    };
+                    
+                    // עדכון התוצאה האישית עם נתונים מה-sharedData לעקביות מלאה
+                    personalResult.totalGrossEarnings = Math.round(this.sharedData.yearlyData.totalGrossEarnings);
+                    personalResult.totalManagementFees = Math.round(this.sharedData.yearlyData.totalManagementFees);
+                    personalResult.totalNetEarnings = Math.round(this.sharedData.yearlyData.totalGrossEarnings - this.sharedData.yearlyData.totalManagementFees);
+                    personalResult.finalBalance = Math.round(this.sharedData.yearlyData.finalBalance);
+                    
+                    // הצגת התוצאה האישית
+                    this.displayPersonalResult(personalResult, currentAge, retirementAge, targetAmount);
+                    
+                    // הצגת גרפים וטבלאות רק אם יש הפקדות נדרשות
+                    const chartSection = document.querySelector('#results .chart-section');
+                    const ageComparisonSection = document.querySelector('#ageComparison').parentElement;
+                    const yearlyTableSection = document.querySelector('#yearlyTable').parentElement;
+                    
+                    if (personalResult.monthlyPayment > 0) {
+                        // הצגת הגרפים והטבלאות
+                        if (chartSection) chartSection.style.display = 'block';
+                        if (ageComparisonSection) ageComparisonSection.style.display = 'block';
+                        if (yearlyTableSection) yearlyTableSection.style.display = 'block';
+                        
+                        // יצירת גרף
+                        this.createChart(currentAge, retirementAge, personalResult.monthlyPayment, annualReturn, existingSavings);
+                        
+                        // יצירת טבלת השוואה לפי גילאים
+                        this.displayAgeComparison(retirementAge, targetAmount, annualReturn, currentAge, existingSavings, managementFee);
+                        
+                        // יצירת טבלה שנתית
+                        this.createYearlyTable(currentAge, retirementAge, personalResult.monthlyPayment, annualReturn);
+                    } else {
+                        // אם אין צורך בהפקדות, נסתיר את הגרפים והטבלאות
+                        if (chartSection) chartSection.style.display = 'none';
+                        if (ageComparisonSection) ageComparisonSection.style.display = 'none';
+                        if (yearlyTableSection) yearlyTableSection.style.display = 'none';
+                    }
+                    
+                    // עדכון כותרת טבלת דמי ניהול
+                    this.updateManagementFeeHeader(managementFee);
+                    
+                    // הצגת הקטע תוצאות
+                    this.resultsSection.classList.remove('hidden');
+                    
+                    // החזרת כפתור למצב רגיל
+                    this.calculateBtn.innerHTML = '✨ חשב את החיסכון הנדרש';
+                    this.calculateBtn.disabled = false;
+                    
+                    // גלילה לתוצאות
+                    setTimeout(() => {
+                        this.resultsSection.scrollIntoView({ behavior: 'smooth' });
+                    }, 300);
+                }, 1000);
+            }
+
+            calculateMonthlyPayment(startAge, endAge, targetAmount, annualReturn, existingSavings = 0, managementFeeRate) {
+                const years = endAge - startAge;
+                const months = years * 12;
+
+                // חישוב מפורט עם הפרדה בין חיסכון קיים לחדש
+                const futureValueOfExisting = existingSavings > 0 ? 
+                    this.calculateFutureValueOfExistingSavings(existingSavings, years, annualReturn, managementFeeRate) : 0;
+                
+                const remainingGap = Math.max(0, targetAmount - futureValueOfExisting);
+                
+                // חישוב ההפקדה החודשית הנדרשת
+                let monthlyPayment = this.findRequiredMonthlyPayment(targetAmount, years, annualReturn, managementFeeRate, existingSavings);
+                
+                // חישוב נתונים עבור ההפקדות החדשות בלבד (אם יש)
+                const newSavingsData = monthlyPayment > 0 ? 
+                    this.calculateYearlyData(monthlyPayment, annualReturn, managementFeeRate, years) : null;
+                
+                // חישוב הנתונים הכוללים
+                const totalYearlyData = this.calculateYearlyDataWithExistingSavings(monthlyPayment, annualReturn, managementFeeRate, years, existingSavings);
+                
+                return {
+                    monthlyPayment: Math.round(monthlyPayment),
+                    totalPayments: Math.round(Math.round(monthlyPayment) * months), // רק ההפקדות החדשות
+                    
+                    // נתונים על החיסכון הקיים
+                    existingSavings: existingSavings,
+                    futureValueOfExisting: Math.round(futureValueOfExisting),
+                    remainingGap: Math.round(remainingGap),
+                    
+                    // נתונים על ההפקדות החדשות בלבד
+                    newSavingsTotal: newSavingsData ? Math.round(newSavingsData.finalBalance) : 0,
+                    newSavingsEarnings: newSavingsData ? Math.round(newSavingsData.totalGrossEarnings - newSavingsData.totalManagementFees) : 0,
+                    
+                    // נתונים כוללים (חיסכון קיים + הפקדות חדשות)
+                    totalGrossEarnings: Math.round(totalYearlyData.totalGrossEarnings),
+                    totalManagementFees: Math.round(totalYearlyData.totalManagementFees),
+                    totalNetEarnings: Math.round(totalYearlyData.totalGrossEarnings - totalYearlyData.totalManagementFees),
+                    finalBalance: Math.round(totalYearlyData.finalBalance),
+                    
+                    // פרמטרים
+                    grossReturn: annualReturn,
+                    netReturn: annualReturn - managementFeeRate,
+                    managementFeeRate: managementFeeRate,
+                    years: years,
+                    months: months,
+                    targetAmount: targetAmount
+                };
+                
+                // וולידציה סופית קריטית - וידוא הגעה ליעד!
+                if (Math.round(totalYearlyData.finalBalance) < targetAmount) {
+                    console.error('❌ בעיה קריטית: התוצאה הסופית לא מגיעה ליעד!');
+                    console.log('יעד:', targetAmount, 'תוצאה:', Math.round(totalYearlyData.finalBalance));
+                    
+                    // תיקון חירום - הגדלת ההפקדה ב-5%
+                    const correctedPayment = Math.ceil(monthlyPayment * 1.05);
+                    console.log('מתקן את ההפקדה מ-', monthlyPayment, 'ל-', correctedPayment);
+                    
+                    // חישוב מחדש עם ההפקדה המתוקנת
+                    const correctedYearlyData = this.calculateYearlyDataWithExistingSavings(correctedPayment, annualReturn, managementFeeRate, years, existingSavings);
+                    const correctedNewSavingsData = correctedPayment > 0 ? 
+                        this.calculateYearlyData(correctedPayment, annualReturn, managementFeeRate, years) : null;
+                    
+                    return {
+                        monthlyPayment: correctedPayment,
+                        totalPayments: Math.round(correctedPayment * months),
+                        existingSavings: existingSavings,
+                        futureValueOfExisting: Math.round(futureValueOfExisting),
+                        remainingGap: Math.round(remainingGap),
+                        newSavingsTotal: correctedNewSavingsData ? Math.round(correctedNewSavingsData.finalBalance) : 0,
+                        newSavingsEarnings: correctedNewSavingsData ? Math.round(correctedNewSavingsData.totalGrossEarnings - correctedNewSavingsData.totalManagementFees) : 0,
+                        totalGrossEarnings: Math.round(correctedYearlyData.totalGrossEarnings),
+                        totalManagementFees: Math.round(correctedYearlyData.totalManagementFees),
+                        totalNetEarnings: Math.round(correctedYearlyData.totalGrossEarnings - correctedYearlyData.totalManagementFees),
+                        finalBalance: Math.round(correctedYearlyData.finalBalance),
+                        grossReturn: annualReturn,
+                        netReturn: annualReturn - managementFeeRate,
+                        managementFeeRate: managementFeeRate,
+                        years: years,
+                        months: months,
+                        targetAmount: targetAmount
+                    };
+                }
+                
+                return {
+                    monthlyPayment: Math.round(monthlyPayment),
+                    totalPayments: Math.round(Math.round(monthlyPayment) * months),
+                    existingSavings: existingSavings,
+                    futureValueOfExisting: Math.round(futureValueOfExisting),
+                    remainingGap: Math.round(remainingGap),
+                    newSavingsTotal: newSavingsData ? Math.round(newSavingsData.finalBalance) : 0,
+                    newSavingsEarnings: newSavingsData ? Math.round(newSavingsData.totalGrossEarnings - newSavingsData.totalManagementFees) : 0,
+                    totalGrossEarnings: Math.round(totalYearlyData.totalGrossEarnings),
+                    totalManagementFees: Math.round(totalYearlyData.totalManagementFees),
+                    totalNetEarnings: Math.round(totalYearlyData.totalGrossEarnings - totalYearlyData.totalManagementFees),
+                    finalBalance: Math.round(totalYearlyData.finalBalance),
+                    grossReturn: annualReturn,
+                    netReturn: annualReturn - managementFeeRate,
+                    managementFeeRate: managementFeeRate,
+                    years: years,
+                    months: months,
+                    targetAmount: targetAmount
+                };
+            }
+
+            // פונקציה למציאת התשלום החודשי הנדרש - הגיון פשוט ונכון!
+            findRequiredMonthlyPayment(targetAmount, years, annualReturn, managementFeeRate, existingSavings = 0) {
+                // אם אין חיסכון קיים, אלגוריתם פשוט
+                if (existingSavings === 0) {
+                    return this.calculateMonthlyPaymentForAmount(targetAmount, years, annualReturn, managementFeeRate);
+                }
+                
+                // בדיקה: אם החיסכון הקיים כבר מכסה את היעד בלי הפקדות חדשות
+                const resultWithoutNewDeposits = this.calculateYearlyDataWithExistingSavings(0, annualReturn, managementFeeRate, years, existingSavings);
+                if (resultWithoutNewDeposits.finalBalance >= targetAmount) {
+                    return 0; // אין צורך בהפקדות חדשות!
+                }
+                
+                // אלגוריתם מתקדם עם חיסכון קיים - חיפוש בינארי
+                let low = 0;
+                let high = targetAmount / (years * 6); // אסטרטגיה עליונה
+                let bestPayment = high;
+                let iterations = 0;
+                const maxIterations = 50;
+                
+                // חיפוש בינארי מהיר
+                while (high - low > 1 && iterations < maxIterations) {
+                    let mid = (low + high) / 2;
+                    let result = this.calculateYearlyDataWithExistingSavings(mid, annualReturn, managementFeeRate, years, existingSavings);
+                    
+                    if (result.finalBalance < targetAmount) {
+                        low = mid;
+                    } else {
+                        high = mid;
+                        bestPayment = mid;
+                    }
+                    iterations++;
+                }
+                
+                // כוונון מדויק - וידוא הגעה ליעד (משופר)
+                let result = this.calculateYearlyDataWithExistingSavings(bestPayment, annualReturn, managementFeeRate, years, existingSavings);
+                let safetyCounter = 0;
+                
+                // זיהוי בעיית דיוק
+                if (result.finalBalance < targetAmount) {
+                    console.warn('⚠️ אלגוריתם לא הגיע ליעד - מתחיל כוונון מדויק');
+                }
+                
+                // כוונון בצעדים קטנים (0.1 שקל)
+                while (result.finalBalance < targetAmount && safetyCounter < 10000) {
+                    bestPayment += 0.1;
+                    result = this.calculateYearlyDataWithExistingSavings(bestPayment, annualReturn, managementFeeRate, years, existingSavings);
+                    safetyCounter++;
+                    
+                    // אם עדיין לא הגיע אחרי 1000 צעדים, הגדל בצעדים יותר גדולים
+                    if (safetyCounter % 1000 === 0 && result.finalBalance < targetAmount) {
+                        bestPayment += 5; // קפיצה גדולה יותר
+                    }
+                }
+                
+                // וולידציה סופית
+                if (result.finalBalance < targetAmount) {
+                    console.error('❌ בעיה קריטית: האלגוריתם נכשל להגיע ליעד!');
+                    // תיקון חירום - הוספת 5% להפקדה
+                    bestPayment = Math.ceil(bestPayment * 1.05);
+                }
+                
+                return Math.ceil(bestPayment); // עיגול למעלה לשקל שלם
+            }
+
+            // פונקציה לחישוב הפקדה חודשית עבור סכום מסוים (ללא חיסכון קיים)
+            calculateMonthlyPaymentForAmount(targetAmount, years, annualReturn, managementFeeRate) {
+                let low = 0;
+                let high = targetAmount / (years * 6);
+                let bestPayment = high;
+                let iterations = 0;
+                const maxIterations = 100;
+                
+                while (high - low > 0.1 && iterations < maxIterations) {
+                    let mid = (low + high) / 2;
+                    let result = this.calculateYearlyData(mid, annualReturn, managementFeeRate, years);
+                    
+                    if (result.finalBalance < targetAmount) {
+                        low = mid;
+                    } else {
+                        high = mid;
+                        bestPayment = mid;
+                    }
+                    iterations++;
+                }
+                
+                // התאמה עדינה (משופרת)
+                let result = this.calculateYearlyData(bestPayment, annualReturn, managementFeeRate, years);
+                let safetyCounter = 0;
+                
+                // זיהוי בעיית דיוק
+                if (result.finalBalance < targetAmount) {
+                    console.warn('⚠️ אלגוריתם ללא חיסכון קיים לא הגיע ליעד');
+                }
+                
+                // כוונון בצעדים קטנים
+                while (result.finalBalance < targetAmount && safetyCounter < 10000) {
+                    bestPayment += 0.1;
+                    result = this.calculateYearlyData(bestPayment, annualReturn, managementFeeRate, years);
+                    safetyCounter++;
+                    
+                    // אם עדיין לא הגיע, קפיצה גדולה יותר
+                    if (safetyCounter % 1000 === 0 && result.finalBalance < targetAmount) {
+                        bestPayment += 10; // קפיצה גדולה יותר
+                    }
+                }
+                
+                // וולידציה סופית
+                if (result.finalBalance < targetAmount) {
+                    console.error('❌ בעיה קריטית: האלגוריתם ללא חיסכון קיים נכשל!');
+                    bestPayment = Math.ceil(bestPayment * 1.1); // תיקון חירום
+                }
+                
+                return Math.ceil(bestPayment); // עיגול למעלה
+            }
+
+            // פונקציה לחישוב הערך העתידי של החיסכון הקיים
+            calculateFutureValueOfExistingSavings(existingSavings, years, annualReturn, managementFeeRate) {
+                if (existingSavings <= 0) return 0;
+                
+                let currentBalance = existingSavings;
+                const monthlyReturn = Math.pow(1 + annualReturn, 1/12) - 1;
+                const monthlyManagementFee = managementFeeRate / 12;
+                const months = years * 12;
+                
+                // צמיחת החיסכון הקיים לאורך השנים
+                for (let month = 1; month <= months; month++) {
+                    // דמי ניהול חודשיים על היתרה הנוכחית
+                    let monthlyFee = currentBalance * monthlyManagementFee;
+                    
+                    // רווח חודשי על היתרה אחרי ניכוי דמי ניהול
+                    let balanceAfterFee = currentBalance - monthlyFee;
+                    let monthlyEarnings = balanceAfterFee * monthlyReturn;
+                    
+                    // עדכון יתרה
+                    currentBalance = balanceAfterFee + monthlyEarnings;
+                }
+                
+                return currentBalance;
+            }
+
+            // פונקציה פשוטה לבדיקת סכום סופי עם הפקדה והחיסכון הקיים
+            calculateFinalBalanceWithExistingSavings(monthlyPayment, years, annualReturn, managementFeeRate, existingSavings = 0) {
+                let currentBalance = existingSavings; // מתחילים עם החיסכון הקיים
+                const monthlyReturn = Math.pow(1 + annualReturn, 1/12) - 1;
+                const monthlyManagementFee = managementFeeRate / 12;
+                const months = years * 12;
+                
+                // סימולציה חודש אחר חודש - הפקדה בתחילת חודש
+                for (let month = 1; month <= months; month++) {
+                    // הפקדה חודשית בתחילת החודש
+                    currentBalance += monthlyPayment;
+                    
+                    // דמי ניהול חודשיים
+                    let monthlyFee = currentBalance * monthlyManagementFee;
+                    
+                    // רווח חודשי על היתרה אחרי ניכוי דמי ניהול
+                    let balanceAfterFee = currentBalance - monthlyFee;
+                    let monthlyEarnings = balanceAfterFee * monthlyReturn;
+                    
+                    // עדכון יתרה
+                    currentBalance = balanceAfterFee + monthlyEarnings;
+                }
+                
+                return currentBalance;
+            }
+
+            // פונקציה לחישוב נתונים שנתיים עם חיסכון קיים - פשוטה ויעילה
+            calculateYearlyDataWithExistingSavings(monthlyPayment, annualReturn, managementFeeRate, years, existingSavings = 0) {
+                // אם אין חיסכון קיים, נשתמש בפונקציה הרגילה
+                if (existingSavings === 0) {
+                    return this.calculateYearlyData(monthlyPayment, annualReturn, managementFeeRate, years);
+                }
+
+                let currentBalance = existingSavings; // מתחילים עם החיסכון הקיים
+                let totalManagementFees = 0;
+                let totalGrossEarnings = 0;
+                
+                // חישוב תשואה חודשית נכונה: (1 + תשואה ברוטו)^(1/12) - 1
+                const monthlyReturn = Math.pow(1 + annualReturn, 1/12) - 1;
+                const monthlyManagementFee = managementFeeRate / 12;
+                const yearlyData = [];
+
+                // חישוב חודש אחר חודש לכל השנים
+                for (let year = 1; year <= years; year++) {
+                    const startingBalance = currentBalance;
+                    let yearlyGrossEarnings = 0;
+                    let yearlyManagementFees = 0;
+                    
+                    // חישוב חודש אחר חודש בתוך השנה - הפקדה בתחילת חודש
+                    for (let month = 1; month <= 12; month++) {
+                        // הפקדה חודשית בתחילת החודש
+                        currentBalance += monthlyPayment;
+                        
+                        // דמי ניהול חודשיים על כל הסכום
+                        let monthlyFee = currentBalance * monthlyManagementFee;
+                        yearlyManagementFees += monthlyFee;
+                        totalManagementFees += monthlyFee;
+                        
+                        // רווח חודשי על הסכום אחרי ניכוי דמי ניהול
+                        let balanceAfterFee = currentBalance - monthlyFee;
+                        let monthlyEarnings = balanceAfterFee * monthlyReturn;
+                        yearlyGrossEarnings += monthlyEarnings;
+                        totalGrossEarnings += monthlyEarnings;
+                        
+                        // עדכון יתרה
+                        currentBalance = balanceAfterFee + monthlyEarnings;
+                    }
+                    
+                    yearlyData.push({
+                        year: year,
+                        startingBalance: Math.round(startingBalance),
+                        yearlyDeposits: Math.round(monthlyPayment * 12),
+                        annualPayment: Math.round(monthlyPayment * 12), // תאימות עם structure אחר
+                        yearlyGrossEarnings: Math.round(yearlyGrossEarnings),
+                        grossEarnings: Math.round(yearlyGrossEarnings), // תאימות עם structure אחר
+                        yearlyManagementFees: Math.round(yearlyManagementFees),
+                        managementFee: Math.round(yearlyManagementFees), // תאימות עם structure אחר
+                        yearlyNetEarnings: Math.round(yearlyGrossEarnings - yearlyManagementFees),
+                        netEarnings: Math.round(yearlyGrossEarnings - yearlyManagementFees), // תאימות עם structure אחר
+                        endingBalance: Math.round(currentBalance)
+                    });
+                }
+                
+                return {
+                    yearlyData: yearlyData,
+                    finalBalance: currentBalance,
+                    totalGrossEarnings: totalGrossEarnings,
+                    totalManagementFees: totalManagementFees
+                };
+            }
+
+            // פונקציה מרכזית לחישוב נתונים שנתיים עם חישוב חודשי נכון
+            calculateYearlyData(monthlyPayment, annualReturn, managementFeeRate, years) {
+                let currentBalance = 0;
+                let totalManagementFees = 0;
+                let totalGrossEarnings = 0;
+                
+                // חישוב תשואה חודשית נכונה: (1 + תשואה ברוטו)^(1/12) - 1
+                const monthlyReturn = Math.pow(1 + annualReturn, 1/12) - 1;
+                const monthlyManagementFee = managementFeeRate / 12; // דמי ניהול חודשיים
+                const yearlyData = [];
+
+                // חישוב חודש אחר חודש לכל השנים
+
+                for (let year = 1; year <= years; year++) {
+                    const startingBalance = currentBalance;
+                    let yearlyGrossEarnings = 0;
+                    let yearlyManagementFees = 0;
+                    
+                    // חישוב חודש אחר חודש בתוך השנה
+                    for (let month = 1; month <= 12; month++) {
+                        const balanceBeforeDeposit = currentBalance;
+                        
+                        // הפקדה חודשית
+                        currentBalance += monthlyPayment;
+                        const balanceAfterDeposit = currentBalance;
+                        
+                        // דמי ניהול חודשיים על היתרה לפני רווח (שיטה נכונה יותר)
+                        const monthlyFee = currentBalance * monthlyManagementFee;
+                        yearlyManagementFees += monthlyFee;
+                        
+                        // רווח חודשי על היתרה אחרי ניכוי דמי ניהול - חישוב נכון של ריבית דריבית
+                        const balanceAfterFee = currentBalance - monthlyFee;
+                        const monthlyEarning = balanceAfterFee * monthlyReturn;
+                        currentBalance = balanceAfterFee + monthlyEarning;
+                        yearlyGrossEarnings += monthlyEarning;
+                        const balanceAfterEarning = currentBalance;
+                        
+                        // בדיקה מפורטת לחודש הראשון של השנה הראשונה
+                        if (year === 1 && month === 1) {
+                            console.log(`\nחודש ${month}, שנה ${year}:`);
+                            console.log('יתרה לפני הפקדה:', balanceBeforeDeposit.toFixed(2));
+                            console.log('אחרי הפקדה:', balanceAfterDeposit.toFixed(2));
+                            console.log('דמי ניהול:', monthlyFee.toFixed(2));
+                            console.log('אחרי ניכוי דמי ניהול:', balanceAfterFee.toFixed(2));
+                            console.log('רווח חודשי:', monthlyEarning.toFixed(2));
+                            console.log('יתרה סופית:', currentBalance.toFixed(2));
+                        }
+                    }
+                    
+                    totalGrossEarnings += yearlyGrossEarnings;
+                    totalManagementFees += yearlyManagementFees;
+                    
+                    const annualPayment = monthlyPayment * 12;
+                    const netEarnings = yearlyGrossEarnings - yearlyManagementFees;
+                    
+                    // בדיקה לשנה הראשונה
+                    if (year === 1) {
+                        console.log(`\nסיכום שנה ${year}:`);
+                        console.log('רווח ברוטו שנתי:', yearlyGrossEarnings.toFixed(2));
+                        console.log('דמי ניהול שנתיים:', yearlyManagementFees.toFixed(2));
+                        console.log('אחוז דמי ניהול מהיתרה הממוצעת:', ((yearlyManagementFees / (currentBalance / 2)) * 100).toFixed(2) + '%');
+                    }
+                    
+                    yearlyData.push({
+                        year: year,
+                        startingBalance: startingBalance,
+                        annualPayment: annualPayment,
+                        grossEarnings: yearlyGrossEarnings,
+                        managementFee: yearlyManagementFees,
+                        netEarnings: netEarnings,
+                        endingBalance: currentBalance
+                    });
+                }
+
+                // בדיקה סופית
+                const totalPayments = monthlyPayment * years * 12;
+                const effectiveAnnualManagementFee = (totalManagementFees / totalGrossEarnings) * 100;
+                
+                console.log('\nסיכום כולל:');
+                console.log('סך הפקדות:', totalPayments.toFixed(2));
+                console.log('סך רווחים ברוטו:', totalGrossEarnings.toFixed(2));
+                console.log('סך דמי ניהול:', totalManagementFees.toFixed(2));
+                console.log('דמי ניהול כאחוז מהרווחים:', effectiveAnnualManagementFee.toFixed(2) + '%');
+                console.log('יתרה סופית:', currentBalance.toFixed(2));
+
+                return {
+                    yearlyData: yearlyData,
+                    totalManagementFees: totalManagementFees,
+                    totalGrossEarnings: totalGrossEarnings,
+                    finalBalance: currentBalance
+                };
+            }
+
+            createChart(startAge, endAge, monthlyPayment, annualReturn, existingSavings = 0) {
+                const ctx = document.getElementById('savingsChart').getContext('2d');
+                
+                // שימוש בנתונים המשותפים
+                const years = this.sharedData.years;
+                const fullResults = this.sharedData.yearlyData;
+                const labels = [];
+                const totalSavingsData = [];
+                const paymentsData = [];
+                const earningsData = [];
+                
+                // נקודת התחלה - גיל הנוכחי
+                labels.push(`גיל ${startAge}`);
+                totalSavingsData.push(existingSavings); // מתחיל עם חיסכון קיים
+                paymentsData.push(0);
+                earningsData.push(0);
+                
+                // הוספת נתונים מהטבלה השנתית - בדיוק אותם נתונים
+                let cumulativeGrossEarnings = 0;
+                let cumulativeManagementFees = 0;
+                
+                for (let year = 1; year <= years; year++) {
+                    const age = startAge + year;
+                    labels.push(`גיל ${age}`);
+                    
+                    const yearData = fullResults.yearlyData[year - 1];
+                    const cumulativePayments = Math.round(monthlyPayment) * year * 12;
+                    
+                    // צבירה של רווחים ודמי ניהול - בדיוק כמו בתוצאות הראשיות
+                    cumulativeGrossEarnings += (yearData.yearlyGrossEarnings || yearData.grossEarnings);
+                    cumulativeManagementFees += (yearData.yearlyManagementFees || yearData.managementFee);
+                    const cumulativeNetEarnings = cumulativeGrossEarnings - cumulativeManagementFees;
+                    
+                    paymentsData.push(Math.round(cumulativePayments));
+                    earningsData.push(Math.round(Math.max(0, cumulativeNetEarnings)));
+                    totalSavingsData.push(Math.round(yearData.endingBalance));
+                    
+                    // DEBUG: הדפסת הנתונים האחרונים
+                    if (year === years) {
+                        console.log('נתוני הגרף (שנה אחרונה):');
+                        console.log('יתרה סופית:', Math.round(yearData.endingBalance));
+                        console.log('סך הפקדות:', Math.round(cumulativePayments));
+                        console.log('רווח נטו:', Math.round(cumulativeNetEarnings));
+                    }
+                }
+                
+                // עדכון הסבר הגרף
+                const chartExplanation = document.getElementById('chartExplanation');
+                if (chartExplanation && existingSavings > 0) {
+                    chartExplanation.innerHTML = `📊 הגרף מציג את הצמיחה הכוללת: חיסכון קיים (₪${this.formatNumber(Math.round(existingSavings))}) + הפקדות בתחילת חודש + רווחים מתווספים!`;
+                }
+                
+                // מחיקת גרף קיים
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+                
+                // יצירת גרף חדש
+                this.chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'סה"כ חיסכון',
+                                data: totalSavingsData,
+                                borderColor: '#ffd700',
+                                backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                                borderWidth: 4,
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'הפקדות חדשות',
+                                data: paymentsData,
+                                borderColor: '#1e40af',
+                                backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'רווחים כוללים נטו',
+                                data: earningsData,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                borderWidth: 3,
+                                fill: false,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'כוח הריבית דריבית - רואים איך הכסף שלכם עובד!',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                padding: 20
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    font: {
+                                        size: 14
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'גיל',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                grid: {
+                                    display: true,
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'סכום (₪)',
+                                    font: {
+                                        size: 14,
+                                        weight: 'bold'
+                                    }
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₪' + value.toLocaleString('he-IL');
+                                    }
+                                },
+                                grid: {
+                                    display: true,
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        hover: {
+                            animationDuration: 300
+                        },
+                        animation: {
+                            duration: 2000,
+                            easing: 'easeInOutQuart'
+                        }
+                    }
+                });
+            }
+
+            createYearlyTable(startAge, endAge, monthlyPayment, annualReturn) {
+                const tbody = this.yearlyTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                const years = endAge - startAge;
+                // השתמש בדמי הניהול מהנתונים המשותפים שכבר מחושבים
+                const managementFeeRate = this.sharedData.managementFee;
+                
+                // השתמש באותה פונקציה שמשמשת לחישוב התוצאות הראשיות
+                const yearlyResults = this.sharedData.yearlyData;
+
+                yearlyResults.yearlyData.forEach((yearData, index) => {
+                    const currentAgeInYear = startAge + yearData.year - 1;
+                    
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${yearData.year}</td>
+                        <td>${currentAgeInYear + 1}</td>
+                        <td>₪${this.formatNumber(Math.round(yearData.yearlyDeposits || yearData.annualPayment))}</td>
+                        <td>₪${this.formatNumber(Math.round(yearData.startingBalance))}</td>
+                        <td>₪${this.formatNumber(Math.round(yearData.yearlyNetEarnings || yearData.netEarnings))}</td>
+                        <td>${(yearData.yearlyManagementFees || yearData.managementFee) === 0 ? 'ללא' : '₪' + this.formatNumber(Math.round(yearData.yearlyManagementFees || yearData.managementFee))}</td>
+                        <td>₪${this.formatNumber(Math.round(yearData.endingBalance))}</td>
+                    `;
+                    
+                    // הדגשת השנה האחרונה
+                    if (yearData.year === years) {
+                        row.style.background = 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+                        row.style.color = '#ffd700';
+                        row.style.fontWeight = 'bold';
+                    }
+                });
+            }
+
+            displayPersonalResult(result, currentAge, retirementAge, targetAmount) {
+                // חילוץ הנתונים החדשים מהתוצאה
+                const existingSavings = result.existingSavings || 0;
+                const futureValueOfExisting = result.futureValueOfExisting || 0;
+                const newSavingsTotal = result.newSavingsTotal || 0;
+                const newSavingsEarnings = result.newSavingsEarnings || 0;
+                const totalPayments = result.totalPayments || 0;
+                const finalBalance = result.finalBalance;
+                
+                // דיבוג בדיקת הגעה ליעד - קריטי!
+                this.debugTargetReachCheck(result, targetAmount);
+                
+                this.personalResult.innerHTML = `
+                    <div class="result-amount">${result.monthlyPayment === 0 ? '🎉 מזל טוב!' : '₪' + this.formatNumber(result.monthlyPayment)}</div>
+                    <div class="result-text">${result.monthlyPayment === 0 ? 'החיסכון שלך יאפשר לך להגיע ליעד ללא הפקדות חדשות! 🚀' : 'הפקדה חודשית נדרשת למשך ' + result.years + ' שנים'}</div>
+                    
+                    ${existingSavings > 0 ? `
+                        <!-- חיסכון קיים -->
+                        <div class="result-section" style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 16px; color: white;">
+                            <h4 style="margin: 0 0 15px 0; font-size: 1.3rem; display: flex; align-items: center;">
+                                💰 החיסכון הקיים שלך
+                            </h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                                <div>
+                                    <div class="mobile-number" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">₪${this.formatNumber(Math.round(existingSavings))}</div>
+                                    <div class="mobile-label" style="opacity: 0.9;">סכום התחלתי</div>
+                                </div>
+                                <div>
+                                    <div class="mobile-number" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">₪${this.formatNumber(Math.round(futureValueOfExisting))}</div>
+                                    <div class="mobile-label" style="opacity: 0.9;">ערך בגיל ${retirementAge}</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        ${result.monthlyPayment > 0 ? `
+                            <!-- הפקדות חדשות נדרשות -->
+                            <div style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); border-radius: 16px; color: white;">
+                                <h4 style="margin: 0 0 15px 0; font-size: 1.3rem; display: flex; align-items: center;">
+                                    📈 הפקדות חדשות נדרשות
+                                </h4>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <div class="mobile-number" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">₪${this.formatNumber(Math.round(totalPayments))}</div>
+                                        <div class="mobile-label" style="opacity: 0.9;">סה"כ הפקדות</div>
+                                    </div>
+                                    <div>
+                                        <div class="mobile-number" style="font-size: 1.8rem; font-weight: bold; margin-bottom: 5px;">₪${this.formatNumber(Math.round(newSavingsTotal))}</div>
+                                        <div class="mobile-label" style="opacity: 0.9;">ערך בגיל ${retirementAge}</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        ` : `
+                            <!-- הודעת חיסכון קיים מכסה את היעד -->
+                            <div style="margin: 20px 0; padding: 25px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 16px; color: white; text-align: center;">
+                                <div style="font-size: 3rem; margin-bottom: 15px;">🎆</div>
+                                <h4 style="margin: 0 0 15px 0; font-size: 1.4rem; font-weight: bold;">
+                                    מצוין! החיסכון שלך כבר מכסה את היעד
+                                </h4>
+                                <div style="font-size: 1.1rem; line-height: 1.6; opacity: 0.95;">
+                                    💰 אתה כבר במצב מצוין של עצמאות כלכלית!<br>
+                                    החיסכון הקיים שלך יגדל לבד ויגיע ליעד שלך - ללא צורך בהפקדות חדשות!
+                                </div>
+                            </div>
+                        `}
+                        
+                        <!-- סך הרווח -->
+                        <div style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 16px; color: white; text-align: center;">
+                            <h4 style="margin: 0 0 10px 0; font-size: 1.3rem; display: flex; align-items: center; justify-content: center;">
+                                🎆 סך הרווח ${result.monthlyPayment === 0 ? 'מהחיסכון הקיים' : 'הכולל'}
+                            </h4>
+                            <div style="font-size: 2.2rem; font-weight: bold; margin: 10px 0;">
+                                ₪${this.formatNumber(Math.round(result.totalNetEarnings))}
+                            </div>
+                            <div style="opacity: 0.9; font-size: 1rem;">
+                                רווח נטו ${result.managementFeeRate === 0 ? '(ברוטו - ללא דמי ניהול)' : 'לאחר ניכוי דמי ניהול'}
+                            </div>
+                        </div>
+                    ` : `
+                        <!-- ללא חיסכון קיים -->
+                        <div style="margin: 20px 0;">
+                            <div class="stats-grid">
+                                <div class="stat">
+                                    <div class="stat-value">₪${this.formatNumber(Math.round(totalPayments))}</div>
+                                    <div class="stat-label">סה"כ הפקדות חדשות</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">₪${this.formatNumber(Math.round(result.totalNetEarnings))}</div>
+                                    <div class="stat-label">רווח כולל ${result.managementFeeRate === 0 ? '(ברוטו)' : '(נטו)'}</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">₪${this.formatNumber(Math.round(finalBalance))}</div>
+                                    <div class="stat-label">יתרה סופית</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    `}
+                    
+                    ${result.managementFeeRate === 0 ? `
+                        <!-- הודעה מיוחדת לדמי ניהול אפס -->
+                        <div style="margin: 20px 0; padding: 20px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 16px; color: white;">
+                            <h4 style="margin: 0 0 15px 0; font-size: 1.3rem; display: flex; align-items: center;">
+                                🎯 תרחיש אידיאלי - ללא דמי ניהול
+                            </h4>
+                            <div style="font-size: 1rem; line-height: 1.6;">
+                                <strong>שימו לב:</strong> החישוב מבוסס על תרחיש תיאורטי ללא דמי ניהול כלל. 
+                                במציאות, כל מוצר השקעה כרוך בעלויות כלשהן. תוצאה זו מיועדת להשוואה בלבד.
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+
+
+                    <!-- סיכום סופי -->
+                    <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #ffd700 0%, #f59e0b 100%); border-radius: 16px; color: #1f2937;">
+                        <h4 style="margin: 0 0 10px 0; font-size: 1.3rem;">🎯 סיכום התוכנית</h4>
+                        <div style="font-size: 1.1rem; line-height: 1.6;">
+                            ${result.monthlyPayment === 0 ? 
+                                `החיסכון הקיים (₪${this.formatNumber(Math.round(existingSavings))}) יגדל לבד = <span style="font-size: 1.4rem; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">₪${this.formatNumber(Math.round(finalBalance))} בגיל ${retirementAge}</span>` :
+                                existingSavings > 0 ? 
+                                    `החיסכון הקיים (₪${this.formatNumber(Math.round(existingSavings))}) + הפקדות חודשיות (₪${this.formatNumber(result.monthlyPayment)}) = <span style="font-size: 1.4rem; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">₪${this.formatNumber(Math.round(finalBalance))} בגיל ${retirementAge}</span>` :
+                                    `הפקדות של ₪${this.formatNumber(result.monthlyPayment)} לחודש = <span style="font-size: 1.4rem; font-weight: bold; color: #000000; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">₪${this.formatNumber(Math.round(finalBalance))} בגיל ${retirementAge}</span>`
+                            }
+                        </div>
+                        <div style="margin-top: 15px; padding: 15px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); border-radius: 12px; text-align: center;">
+                            <div style="font-size: 1.4rem; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+                                ${finalBalance >= targetAmount ? '🎯✨ מגיע ליעד שהוגדר בהצלחה! ✨🎯' : '⚠️ לא מגיע ליעד - יש לבדוק את החישוב'}
+                            </div>
+
+                        </div>
+                    </div>
+                    
+
+                `;
+                
+                this.personalResult.classList.add('show');
+            }
+
+            displayAgeComparison(retirementAge, targetAmount, annualReturn, currentAge, existingSavings = 0, managementFeeRate) {
+                const ages = [25, 30, 35, 40, 45, 50, 55];
+                const validAges = ages.filter(age => age < retirementAge);
+                
+                this.ageComparison.innerHTML = '';
+
+                validAges.forEach(age => {
+                    const result = this.calculateMonthlyPayment(age, retirementAge, targetAmount, annualReturn, existingSavings, managementFeeRate);
+                    const isCurrentAge = age === currentAge;
+                    
+                    const ageRow = document.createElement('div');
+                    ageRow.className = `comparison-row ${isCurrentAge ? 'highlight' : ''}`;
+                    
+                    ageRow.innerHTML = `
+                        <div class="age">
+                            גיל ${age}
+                            ${isCurrentAge ? '<div style="background: #ffd700; color: #2d3748; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-top: 5px;">הגיל שלך</div>' : ''}
+                        </div>
+                        <div class="amount">₪${this.formatNumber(result.monthlyPayment)} לחודש</div>
+                    `;
+                    
+                    this.ageComparison.appendChild(ageRow);
+                });
+
+                // הוספת הודעת עידוד
+                const encouragementDiv = document.createElement('div');
+                encouragementDiv.style.cssText = 'background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color: #ffd700; border-radius: 12px; padding: 25px; margin-top: 20px; text-align: center; border: 2px solid #ffd700;';
+                encouragementDiv.innerHTML = `
+                    <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 10px;">
+                        🏆 זכרו: התחלה מוקדמת = חיסכון גדול!
+                    </div>
+                    <div style="font-size: 1.1rem;">
+                        כל עשור של דחייה כמעט מכפיל את הסכום החודשי הנדרש
+                    </div>
+                `;
+                
+                this.ageComparison.appendChild(encouragementDiv);
+                this.ageComparison.classList.add('show');
+            }
+
+            // מערכת הערות מעודדות קופצות
+            startFloatingTips() {
+                const tips = [
+                    {
+                        icon: '💡',
+                        text: 'טיפ חכם: ככל שמתחילים מוקדם יותר, כך פחות צריך לחסוך מדי חודש!'
+                    },
+                    {
+                        icon: '📈',
+                        text: 'עובדה מדהימה: תשואה של 8% שנתית מכפילה את הכסף כל 9 שנים בערך!'
+                    },
+                    {
+                        icon: '⏰',
+                        text: 'זכרו תמיד: זמן הוא החבר הכי טוב של החוסך לפנסיה!'
+                    },
+                    {
+                        icon: '💪',
+                        text: 'התחילו עכשיו: גם 500 שקל בחודש יכולים להפוך למיליונים!'
+                    },
+                    {
+                        icon: '🎯',
+                        text: 'המטרה ברורה: לא צריך להגיע בדיוק ליעד - כל חיסכון טוב מאפס!'
+                    },
+                    {
+                        icon: '🌟',
+                        text: 'הסוד הגדול: עקביות קטנה מנצחת התלהבות גדולה שנגמרת מהר!'
+                    },
+                    {
+                        icon: '🚀',
+                        text: 'רק תחשבו: מי שהתחיל לחסוך בגיל 25 חוסך פי 8 פחות מחודש ממי שמתחיל ב-50!'
+                    }
+                ];
+
+                let currentTipIndex = 0;
+
+                const showTip = () => {
+                    // הסרת טיפ קודם
+                    const existingTip = document.querySelector('.floating-tip');
+                    if (existingTip) {
+                        existingTip.remove();
+                    }
+
+                    const tip = tips[currentTipIndex];
+                    const tipElement = document.createElement('div');
+                    tipElement.className = 'floating-tip';
+                    
+                    tipElement.innerHTML = `
+                        <button class="tip-close" onclick="this.parentElement.remove()">×</button>
+                        <div class="tip-icon">${tip.icon}</div>
+                        <div>${tip.text}</div>
+                    `;
+                    
+                    document.body.appendChild(tipElement);
+                    
+                    // אנימציה להצגה
+                    setTimeout(() => {
+                        tipElement.classList.add('show');
+                    }, 100);
+                    
+                    // הסרה אוטומטית אחרי 6 שניות
+                    setTimeout(() => {
+                        if (tipElement.parentElement) {
+                            tipElement.classList.remove('show');
+                            setTimeout(() => {
+                                if (tipElement.parentElement) {
+                                    tipElement.remove();
+                                }
+                            }, 500);
+                        }
+                    }, 6000);
+
+                    currentTipIndex = (currentTipIndex + 1) % tips.length;
+                };
+
+                // הצגת טיפ ראשון אחרי 10 שניות
+                setTimeout(showTip, 10000);
+                
+                // הצגת טיפים כל 25 שניות
+                setInterval(showTip, 25000);
+            }
+
+            // פונקציה לעדכון כותרת טבלת דמי הניהול
+            updateManagementFeeHeader(managementFeeRate) {
+                const headerElement = document.getElementById('managementFeeHeader');
+                if (headerElement) {
+                    if (managementFeeRate === 0) {
+                        headerElement.textContent = 'דמי ניהול (ללא)';
+                    } else {
+                        const percentageDisplay = (managementFeeRate * 100).toFixed(1);
+                        headerElement.textContent = `דמי ניהול (${percentageDisplay}%)`;
+                    }
+                }
+            }
+
+            // פונקציה לדיבוג נתונים מפורטת
+            debugCalculationResults(monthlyPayment, result, sharedData) {
+                console.log('\n=== דיבוג תוצאות חישוב מפורט ===');
+                console.log('🔢 נתונים בסיסיים:');
+                console.log('  הפקדה חודשית (לא מעוגלת):', monthlyPayment);
+                console.log('  הפקדה חודשית (מעוגלת):', Math.round(monthlyPayment));
+                console.log('  מספר חודשים:', result.months);
+                console.log('  דמי ניהול %:', (result.managementFeeRate * 100).toFixed(1));
+                
+                console.log('\n💰 חישובי הפקדות:');
+                console.log('  סך הפקדות (מחושב):', Math.round(monthlyPayment) * result.months);
+                console.log('  סך הפקדות (מדווח):', result.totalPayments);
+                console.log('  הפרש הפקדות:', result.totalPayments - (Math.round(monthlyPayment) * result.months));
+                
+                console.log('\n📈 חישובי רווחים:');
+                console.log('  רווח ברוטו כולל:', result.totalGrossEarnings);
+                console.log('  דמי ניהול כולל:', result.totalManagementFees);
+                console.log('  רווח נטו (ברוטו-דמי ניהול):', result.totalNetEarnings);
+                console.log('  בדיקה: ברוטו - דמי ניהול =', result.totalGrossEarnings - result.totalManagementFees);
+                
+                console.log('\n🎯 יתרה סופית:');
+                console.log('  יתרה סופית (מדווח):', result.finalBalance);
+                console.log('  הפקדות + רווח נטו =', result.totalPayments + result.totalNetEarnings);
+                console.log('  הפרש יתרה:', result.finalBalance - (result.totalPayments + result.totalNetEarnings));
+                
+                console.log('\n✅ בדיקות עקביות:');
+                // הנוסחה הנכונה: יתרה סופית = חיסכון קיים + הפקדות + רווחים כוללים - דמי ניהול כוללים
+                const expectedBalance = result.existingSavings + result.totalPayments + result.totalGrossEarnings - result.totalManagementFees;
+                const consistencyCheck1 = Math.abs(result.finalBalance - expectedBalance) < 1;
+                const consistencyCheck2 = Math.abs(result.totalNetEarnings - (result.totalGrossEarnings - result.totalManagementFees)) < 1;
+                console.log('  יתרה = חיסכון קיים + הפקדות + רווחים - דמי ניהול:', consistencyCheck1 ? '✅' : '❌');
+                console.log('  רווח נטו = ברוטו - דמי ניהול:', consistencyCheck2 ? '✅' : '❌');
+                console.log('  צפוי:', expectedBalance, ', בפועל:', result.finalBalance);
+                
+                // חישוב תיאורטי לוולידציה (עם 8% ללא דמי ניהול)
+                if (result.managementFeeRate === 0) {
+                    console.log('\n🧮 וולידציה תיאורטית (8% ללא דמי ניהול):');
+                    const monthlyRate = Math.pow(1.08, 1/12) - 1;
+                    const totalFV = result.totalPayments / monthlyRate * (Math.pow(1 + monthlyRate, result.months) - 1);
+                    const theoreticalEarnings = totalFV - result.totalPayments;
+                    console.log('  רווח תיאורטי צפוי:', theoreticalEarnings.toFixed(0));
+                    console.log('  רווח בפועל:', result.totalNetEarnings);
+                    console.log('  הפרש:', Math.abs(theoreticalEarnings - result.totalNetEarnings).toFixed(0));
+                    console.log('  התאמה:', Math.abs(theoreticalEarnings - result.totalNetEarnings) < 1000 ? '✅' : '❌');
+                }
+                
+                // השוואה לטבלה השנתית
+                if (sharedData && sharedData.yearlyData && sharedData.yearlyData.yearlyData) {
+                    const tableData = sharedData.yearlyData;
+                    console.log('\n📊 השוואה לטבלה השנתית:');
+                    console.log('  יתרה סופית בטבלה:', tableData.finalBalance);
+                    console.log('  רווח ברוטו בטבלה:', tableData.totalGrossEarnings);
+                    console.log('  דמי ניהול בטבלה:', tableData.totalManagementFees);
+                    console.log('  התאמה יתרה סופית:', Math.abs(result.finalBalance - tableData.finalBalance) < 1 ? '✅' : '❌');
+                }
+            }
+            
+            // פונקציה לדיבוג בדיקת הגעה ליעד
+            debugTargetReachCheck(result, targetAmount) {
+                const reachesTarget = result.finalBalance >= targetAmount;
+                const shortfall = targetAmount - result.finalBalance;
+                
+                console.log('\n=== 🎯 בדיקת הגעה ליעד - קריטי! ===');
+                console.log('🎯 יעד מבוקש:', this.formatNumber(targetAmount));
+                console.log('💰 תוצאה מחושבת:', this.formatNumber(result.finalBalance));
+                console.log('📈 הפרש:', this.formatNumber(result.finalBalance - targetAmount));
+                
+                if (reachesTarget) {
+                    console.log('✅ סטאטוס: מגיע ליעד! 🎉');
+                    if (result.finalBalance - targetAmount > targetAmount * 0.1) {
+                        console.warn('⚠️ חריגה גדולה מהיעד - אולי ניתן למטֱ');
+                    }
+                } else {
+                    console.error('\n❌ סטאטוס: לא מגיע ליעד! בעיה קריטית!');
+                    console.log('😱 חסר:', this.formatNumber(Math.abs(shortfall)));
+                    console.log('💵 הפקדה חודשית נוכחית:', result.monthlyPayment);
+                    console.log('💰 חיסכון קיים:', result.existingSavings || 0);
+                    console.log('📅 שנים:', result.years);
+                    console.log('📈 תשואה ברוטו:', (result.grossReturn * 100).toFixed(1) + '%');
+                    console.log('💼 דמי ניהול:', (result.managementFeeRate * 100).toFixed(1) + '%');
+                    console.log('🔧 הצעה: הגדל את ההפקדה ל-', Math.ceil(result.monthlyPayment * 1.05));
+                }
+            }
+
+            // פונקציה לבדיקת נכונות חישוב דמי הניהול
+            validateManagementFees(sharedData) {
+                console.log('\n=== בדיקת וולידציה לדמי ניהול ===');
+                
+                const yearlyData = sharedData.yearlyData.yearlyData;
+                const totalManagementFees = sharedData.yearlyData.totalManagementFees;
+                const managementFeeRate = sharedData.managementFee; // שימוש בדמי ניהול דינמיים
+                
+                // בדיקה 1: האם דמי הניהול השנתיים הגיוניים
+                let calculatedTotalFees = 0;
+                yearlyData.forEach((year, index) => {
+                    calculatedTotalFees += year.managementFee;
+                    
+                    // בדיקה לשנים הראשונות
+                    if (index < 3) {
+                        const avgBalance = (year.startingBalance + year.endingBalance) / 2;
+                        const expectedAnnualFee = avgBalance * managementFeeRate;
+                        const feeRatio = year.managementFee / expectedAnnualFee;
+                        
+                        console.log(`שנה ${year.year}:`);
+                        console.log(`  יתרה ממוצעת: ${avgBalance.toFixed(0)}`);
+                        console.log(`  דמי ניהול בפועל: ${year.managementFee.toFixed(0)}`);
+                        console.log(`  דמי ניהול צפויים: ${expectedAnnualFee.toFixed(0)}`);
+                        console.log(`  יחס: ${feeRatio.toFixed(2)}`);
+                    }
+                });
+                
+                // בדיקה 2: האם סך דמי הניהול תואם
+                const feesDifference = Math.abs(calculatedTotalFees - totalManagementFees);
+                console.log(`\nסך דמי ניהול מחושב: ${calculatedTotalFees.toFixed(0)}`);
+                console.log(`סך דמי ניהול מדווח: ${totalManagementFees.toFixed(0)}`);
+                console.log(`הפרש: ${feesDifference.toFixed(0)} ${feesDifference < 1 ? '✅' : '❌'}`);
+                
+                // בדיקה 3: האם דמי הניהול תואמים לאחוז שהוזן
+                const avgTotalBalance = yearlyData[yearlyData.length - 1].endingBalance / 2;
+                const expectedTotalFees = avgTotalBalance * managementFeeRate * sharedData.years;
+                const actualFeePercentage = (totalManagementFees / avgTotalBalance / sharedData.years) * 100;
+                const expectedPercentage = managementFeeRate * 100;
+                
+                console.log(`\nבדיקת אחוז דמי ניהול:`);
+                console.log(`צבירה ממוצעת כוללת: ${avgTotalBalance.toFixed(0)}`);
+                console.log(`אחוז דמי ניהול בפועל: ${actualFeePercentage.toFixed(2)}%`);
+                console.log(`אחוז דמי ניהול צפוי: ${expectedPercentage.toFixed(1)}%`);
+                console.log(`התאמה: ${Math.abs(actualFeePercentage - expectedPercentage) < 0.1 ? '✅' : '❌'}`);
+                
+                console.log('=== סיום בדיקת וולידציה ===\n');
+            }
+
+            // פונקציה לעיצוב מספרים עם פסיקים בשדה קלט
+            formatNumberInput(input) {
+                // הסרת כל מה שאינו ספרה
+                let value = input.value.replace(/[^\d]/g, '');
+                
+                // אם השדה ריק, לא עושים כלום
+                if (value === '') {
+                    input.value = '';
+                    return;
+                }
+                
+                // המרה למספר ועיצוב עם פסיקים
+                const number = parseInt(value);
+                if (!isNaN(number)) {
+                    input.value = number.toLocaleString('he-IL');
+                }
+            }
+
+            formatNumber(num) {
+                return new Intl.NumberFormat('he-IL').format(num);
+            }
+        }
+
+        // אתחול המחשבון כשהדף נטען
+        document.addEventListener('DOMContentLoaded', () => {
+            new PensionCalculator();
+            showPrivacyPopup();
+        });
+
+        // פונקציות לטיפול בפופאפ מדיניות הפרטיות
+        function showPrivacyPopup() {
+            // בודק אם המשתמש כבר ראה את הפופאפ
+            const hasSeenPrivacyPopup = localStorage.getItem('privacyPopupSeen');
+            
+            if (!hasSeenPrivacyPopup) {
+                setTimeout(() => {
+                    const overlay = document.getElementById('privacyOverlay');
+                    overlay.classList.add('show');
+                }, 1000); // מציג אחרי שנייה
+            }
+        }
+
+        function closePrivacyPopup() {
+            const overlay = document.getElementById('privacyOverlay');
+            overlay.classList.remove('show');
+            
+            // שומר שהמשתמש כבר ראה את הפופאפ
+            localStorage.setItem('privacyPopupSeen', 'true');
+        }
+
+        // אפשרות לסגירה בלחיצה על הרקע או ESC
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.getElementById('privacyOverlay');
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    closePrivacyPopup();
+                }
+            });
+
+            // סגירה עם ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && overlay.classList.contains('show')) {
+                    closePrivacyPopup();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
