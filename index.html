@@ -1044,7 +1044,7 @@
                 const retirementAge = parseInt(document.getElementById('retirementAge').value);
 
                 return currentAge && targetAmount && !isNaN(annualReturn) && !isNaN(managementFee) && retirementAge &&
-                       currentAge >= 18 && currentAge < retirementAge && targetAmount > 0 && annualReturn >= 0 &&
+                       currentAge >= 0 && currentAge < retirementAge && targetAmount > 0 && annualReturn >= 0 &&
                        existingSavings >= 0 && managementFee >= 0 && managementFee <= 5;
             }
 
